@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { postLoginBody } from "@/orval/gen/endpoints/authentication/authentication.zod";
 import { signIn, getSession } from "next-auth/react";
+import { LoadingButton } from "@/components/loading-button";
 
 const loginSchema = postLoginBody.extend({
   email: z
@@ -104,9 +105,9 @@ export function LoginForm() {
                 )}
               />
 
-              <Button type="submit" className="w-full">
+              <LoadingButton type="submit" className="w-full" loading={false}>
                 Login
-              </Button>
+              </LoadingButton>
             </form>
           </Form>
           <div className="pt-6 text-center text-sm">
