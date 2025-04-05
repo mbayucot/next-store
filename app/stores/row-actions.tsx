@@ -39,6 +39,9 @@ export function RowActions(row: RowActionsProps) {
                 Delete
               </Button>
             }
+            onConfirm={() => {
+              console.log("Delete action triggered");
+            }}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>

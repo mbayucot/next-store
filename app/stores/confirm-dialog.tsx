@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,16 +11,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { OctagonAlert, X } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { X } from "lucide-react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import { ReactNode } from "react";
 
 interface ConfirmDialogProps {
-  trigger?: any;
+  trigger: ReactNode;
   title?: string;
+  onConfirm: () => void;
 }
 
-export default function ConfirmDialog({ trigger, title }: ConfirmDialogProps) {
+export default function ConfirmDialog({
+  trigger,
+  title = "Item",
+  onConfirm,
+}: ConfirmDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -38,13 +46,20 @@ export default function ConfirmDialog({ trigger, title }: ConfirmDialogProps) {
         <AlertDialogHeader className="pt-2">
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription className="text-[15px]">
-            This action cannot be undone. This will permanently delete your
-            {title?.toLowerCase()}.
+            This action cannot be undone. This will permanently delete your{" "}
+            {title.toLowerCase()}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-2">
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
