@@ -13,11 +13,11 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { DatePickerWithRange } from "./date-range-picker";
-import { Overview } from "@/app/dashboard/overview";
-import { RecentSales } from "@/app/dashboard/recent-sales";
-import { ChartAreaGradient } from "@/app/dashboard/chart-area-gradient";
-import { ChartBarMultiple } from "@/app/dashboard/chart-bar-multiple";
-import { ChartPieDonutText } from "@/app/dashboard/chart-pie-donut-text";
+import { Overview } from "@/app/(protected)/dashboard/overview";
+import { RecentSales } from "@/app/(protected)/dashboard/recent-sales";
+import { ChartAreaGradient } from "@/app/(protected)/dashboard/chart-area-gradient";
+import { ChartBarMultiple } from "@/app/(protected)/dashboard/chart-bar-multiple";
+import { ChartPieDonutText } from "@/app/(protected)/dashboard/chart-pie-donut-text";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 

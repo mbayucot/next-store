@@ -43,6 +43,112 @@ paths:
         '401':
           description: Unauthorized
 
+  /stores:
+    get:
+      summary: Get all stores
+      tags:
+        - Store
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of stores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Store'
+
+    post:
+      summary: Create a new store
+      tags:
+        - Store
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCreate'
+      responses:
+        '201':
+          description: Store created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+
+  /stores/{id}:
+    get:
+      summary: Get store by ID
+      tags:
+        - Store
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Store details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Store not found
+
+    put:
+      summary: Update a store by ID
+      tags:
+        - Store
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCreate'
+      responses:
+        '200':
+          description: Updated store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Store not found
+
+    delete:
+      summary: Delete a store by ID
+      tags:
+        - Store
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Store deleted
+        '404':
+          description: Store not found
+
 components:
   securitySchemes:
     bearerAuth:
@@ -82,3 +188,35 @@ components:
         updated_at:
           type: string
           format: date-time
+
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "My Store"
+        address:
+          type: string
+          example: "123 Main St"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StoreCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My Store"
+        address:
+          type: string
+          example: "123 Main St"
+      required:
+        - name
+        - address

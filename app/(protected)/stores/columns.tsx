@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { RowActions } from "@/app/stores/row-actions";
+import { RowActions } from "@/app/(protected)/stores/row-actions";
 
 export const columns: ColumnDef<never>[] = [
   {

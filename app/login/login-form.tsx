@@ -4,8 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { toast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -16,11 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { postLoginBody } from "@/orval/gen/endpoints/authentication/authentication.zod";
 import { signIn, getSession } from "next-auth/react";
 import { LoadingButton } from "@/components/loading-button";
 
-const loginSchema = postLoginBody.extend({
+const loginSchema = z.object({
   email: z
     .string()
     .nonempty("Email is required")
