@@ -13,19 +13,16 @@ import type {
   UseMutationResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   LoginRequest,
   User
 } from '../store.schemas';
 
+import { customInstance } from '../../lib/custom-instance';
+import type { ErrorType, BodyType } from '../../lib/custom-instance';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -33,36 +30,39 @@ import type {
  * @summary Login user and return JWT token
  */
 export const postLogin = (
-    loginRequest: LoginRequest, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<User>> => {
-    
-    
-    return axios.post(
-      `/login`,
-      loginRequest,options
-    );
-  }
+    loginRequest: BodyType<LoginRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<User>(
+      {url: `/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: loginRequest, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getPostLoginMutationOptions = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext> => {
+export const getPostLoginMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: BodyType<LoginRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: BodyType<LoginRequest>}, TContext> => {
     
 const mutationKey = ['postLogin'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, {data: LoginRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, {data: BodyType<LoginRequest>}> = (props) => {
           const {data} = props ?? {};
 
-          return  postLogin(data,axiosOptions)
+          return  postLogin(data,requestOptions)
         }
 
         
@@ -71,18 +71,18 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postLogin>>>
-    export type PostLoginMutationBody = LoginRequest
-    export type PostLoginMutationError = AxiosError<void>
+    export type PostLoginMutationBody = BodyType<LoginRequest>
+    export type PostLoginMutationError = ErrorType<void>
 
     /**
  * @summary Login user and return JWT token
  */
-export const usePostLogin = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext>, axios?: AxiosRequestConfig}
+export const usePostLogin = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: BodyType<LoginRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationResult<
         Awaited<ReturnType<typeof postLogin>>,
         TError,
-        {data: LoginRequest},
+        {data: BodyType<LoginRequest>},
         TContext
       > => {
 
@@ -94,27 +94,28 @@ export const usePostLogin = <TError = AxiosError<void>,
  * @summary Logout user and revoke JWT token
  */
 export const deleteLogout = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<void>> => {
     
-    
-    return axios.delete(
-      `/logout`,options
-    );
-  }
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<void>(
+      {url: `/logout`, method: 'DELETE'
+    },
+      options);
+    }
+  
 
 
-
-export const getDeleteLogoutMutationOptions = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+export const getDeleteLogoutMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteLogout>>, TError,void, TContext> => {
     
 const mutationKey = ['deleteLogout'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -122,7 +123,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteLogout>>, void> = () => {
           
 
-          return  deleteLogout(axiosOptions)
+          return  deleteLogout(requestOptions)
         }
 
         
@@ -132,13 +133,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type DeleteLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof deleteLogout>>>
     
-    export type DeleteLogoutMutationError = AxiosError<void>
+    export type DeleteLogoutMutationError = ErrorType<void>
 
     /**
  * @summary Logout user and revoke JWT token
  */
-export const useDeleteLogout = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+export const useDeleteLogout = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationResult<
         Awaited<ReturnType<typeof deleteLogout>>,
         TError,
