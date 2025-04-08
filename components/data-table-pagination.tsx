@@ -16,12 +16,26 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const { pageIndex, pageSize } = table.getState().pagination;
+  const totalItems = table.options?.pageCount
+    ? (table.options?.meta?.totalCount ?? 0)
+    : table.getRowModel().rows.length;
+
+  const pageCount = table.getPageCount();
+  const canPrevious = pageIndex > 0;
+  const canNext = pageIndex < pageCount - 1;
+
+  const startItem = totalItems === 0 ? 0 : pageIndex * pageSize + 1;
+  const endItem = Math.min(totalItems, (pageIndex + 1) * pageSize);
+
   return (
-    <div className="w-full flex items-center justify-end gap-2">
+    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-2 mt-4">
+      <span className="text-sm text-muted-foreground">
+        Showing {startItem}–{endItem} of {totalItems}
+      </span>
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground whitespace-nowrap">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          Page {pageIndex + 1} of {pageCount}
         </span>
         <Pagination>
           <PaginationContent>
@@ -30,8 +44,8 @@ export function DataTablePagination<TData>({
                 aria-label="Go to previous page"
                 size="icon"
                 variant="ghost"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
+                onClick={() => table.setPageIndex(pageIndex - 1)}
+                disabled={!canPrevious}
               >
                 <ChevronLeftIcon className="h-4 w-4" />
               </Button>
@@ -41,8 +55,8 @@ export function DataTablePagination<TData>({
                 aria-label="Go to next page"
                 size="icon"
                 variant="ghost"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
+                onClick={() => table.setPageIndex(pageIndex + 1)}
+                disabled={!canNext}
               >
                 <ChevronRightIcon className="h-4 w-4" />
               </Button>

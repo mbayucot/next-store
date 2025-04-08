@@ -73,14 +73,12 @@ export function RowActions(row: RowActionsProps) {
             storeId={row.row.id}
             title="Edit Store"
             trigger={
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full px-2 py-1.5 justify-start"
-                >
-                  Edit
-                </Button>
-              </DialogTrigger>
+              <Button
+                variant="ghost"
+                className="w-full px-2 py-1.5 justify-start"
+              >
+                Edit
+              </Button>
             }
           />
         </DropdownMenuItem>

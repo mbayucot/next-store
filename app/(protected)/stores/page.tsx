@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useGetStores } from "@/generated/store/store";
 import SearchBar from "@/components/searchbar";
 import { DataTable } from "@/components/data-table";
@@ -11,11 +11,22 @@ import { columns } from "./columns";
 import { FormDialog } from "./form-dialog";
 
 export default function StoresPage() {
-  const { data, isLoading, isError } = useGetStores();
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const { pageIndex, pageSize } = pagination;
+
+  const { data, isLoading, isError } = useGetStores({
+    page: pageIndex + 1, // backend expects 1-based
+    limit: pageSize,
+  });
 
   if (isError) return <p className="p-4 text-red-500">Failed to load stores</p>;
 
-  const stores = data || [];
+  const stores = data?.data ?? [];
+  const totalCount = data?.meta?.totalCount ?? 0;
 
   return (
     <div className="p-4 space-y-4">
@@ -24,14 +35,24 @@ export default function StoresPage() {
           trigger={
             <DialogTrigger asChild>
               <Button>
-                <Plus /> New Store
+                <Plus className="mr-2 h-4 w-4" />
+                New Store
               </Button>
             </DialogTrigger>
           }
         />
         <SearchBar onSearch={(data) => console.log(data)} />
       </div>
-      <DataTable columns={columns} data={stores} loading={isLoading} />
+      <DataTable
+        columns={columns}
+        data={stores}
+        loading={isLoading}
+        pageCount={Math.ceil(totalCount / pageSize)}
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        onPaginationChange={setPagination}
+        totalCount={totalCount}
+      />
     </div>
   );
 }

@@ -16,26 +16,48 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DataTablePagination } from "@/components/data-table-pagination";
 import * as React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading?: boolean;
+  pageCount: number;
+  pageIndex: number;
+  pageSize: number;
+  onPaginationChange: (pagination: {
+    pageIndex: number;
+    pageSize: number;
+  }) => void;
+  totalCount: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   loading = false,
+  pageCount,
+  pageIndex,
+  pageSize,
+  onPaginationChange,
+  totalCount,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    manualPagination: true,
+    pageCount,
+    state: {
+      pagination: { pageIndex, pageSize },
+    },
+    onPaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    meta: {
+      totalCount,
+    },
   });
 
   const skeletonRows = 8;
@@ -48,7 +70,7 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className="[&>*]:whitespace-nowrap sticky top-0 bg-background after:content-[''] after:inset-x-0 after:h-px after:bg-border after:absolute after:bottom-0"
+                className="sticky top-0 bg-background"
               >
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
@@ -76,10 +98,7 @@ export function DataTable<TData, TValue>({
               ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

@@ -45,20 +45,31 @@ paths:
 
   /stores:
     get:
-      summary: Get all stores
+      summary: Get all stores with pagination and search
       tags:
         - Store
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: coffee
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
       responses:
         '200':
-          description: List of stores
+          description: List of stores with pagination metadata
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Store'
+                $ref: '#/components/schemas/StoreListResponse'
 
     post:
       summary: Create a new store
@@ -207,6 +218,40 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    StoreListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+        meta:
+          type: object
+          properties:
+            totalCount:
+              type: integer
+              example: 37
+            totalPages:
+              type: integer
+              example: 4
+            currentPage:
+              type: integer
+              example: 2
+            nextPage:
+              type: integer
+              nullable: true
+              example: 3
+            previousPage:
+              type: integer
+              nullable: true
+              example: 1
+            hasNextPage:
+              type: boolean
+              example: true
+            hasPreviousPage:
+              type: boolean
+              example: true
 
     StoreCreate:
       type: object

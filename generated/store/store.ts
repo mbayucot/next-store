@@ -23,8 +23,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  GetStoresParams,
   Store,
-  StoreCreate
+  StoreCreate,
+  StoreListResponse
 } from '../store.schemas';
 
 import { customInstance } from '../../lib/custom-instance';
@@ -36,36 +38,37 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary Get all stores
+ * @summary Get all stores with pagination and search
  */
 export const getStores = (
-    
+    params?: GetStoresParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<Store[]>(
-      {url: `/stores`, method: 'GET', signal
+      return customInstance<StoreListResponse>(
+      {url: `/stores`, method: 'GET',
+        params, signal
     },
       options);
     }
   
 
-export const getGetStoresQueryKey = () => {
-    return [`/stores`] as const;
+export const getGetStoresQueryKey = (params?: GetStoresParams,) => {
+    return [`/stores`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetStoresQueryOptions = <TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetStoresQueryOptions = <TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>(params?: GetStoresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetStoresQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetStoresQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStores>>> = ({ signal }) => getStores(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStores>>> = ({ signal }) => getStores(params, requestOptions, signal);
 
       
 
@@ -79,7 +82,7 @@ export type GetStoresQueryError = ErrorType<unknown>
 
 
 export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>> & Pick<
+ params: undefined |  GetStoresParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getStores>>,
           TError,
@@ -89,7 +92,7 @@ export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TErr
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>> & Pick<
+ params?: GetStoresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getStores>>,
           TError,
@@ -99,19 +102,19 @@ export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TErr
 
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: GetStoresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Get all stores
+ * @summary Get all stores with pagination and search
  */
 
 export function useGetStores<TData = Awaited<ReturnType<typeof getStores>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: GetStoresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStores>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetStoresQueryOptions(options)
+  const queryOptions = getGetStoresQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

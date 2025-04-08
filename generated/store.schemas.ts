@@ -24,8 +24,30 @@ export interface Store {
   updatedAt?: string;
 }
 
+export type StoreListResponseMeta = {
+  totalCount?: number;
+  totalPages?: number;
+  currentPage?: number;
+  /** @nullable */
+  nextPage?: number | null;
+  /** @nullable */
+  previousPage?: number | null;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+};
+
+export interface StoreListResponse {
+  data?: Store[];
+  meta?: StoreListResponseMeta;
+}
+
 export interface StoreCreate {
   name: string;
   address: string;
 }
+
+export type GetStoresParams = {
+search?: string;
+page?: number;
+};
 

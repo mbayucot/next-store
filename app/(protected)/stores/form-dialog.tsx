@@ -7,10 +7,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 type FormDialogProps = {
-  trigger: React.ReactNode;
+  trigger: React.ReactElement; // ✅ use ReactElement instead of ReactNode
   storeId?: number;
   title?: string;
 };
@@ -24,7 +25,8 @@ export function FormDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {trigger}
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+
       <DialogContent className="p-0">
         <DialogHeader className="p-6 border-b">
           <DialogTitle>{title}</DialogTitle>
