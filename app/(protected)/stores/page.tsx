@@ -15,12 +15,14 @@ export default function StoresPage() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [search, setSearch] = useState("");
 
   const { pageIndex, pageSize } = pagination;
 
   const { data, isLoading, isError } = useGetStores({
     page: pageIndex + 1,
     limit: pageSize,
+    search: search || undefined, // avoid sending empty string
   });
 
   if (isError) return <p className="p-4 text-red-500">Failed to load stores</p>;
@@ -41,8 +43,17 @@ export default function StoresPage() {
             </DialogTrigger>
           }
         />
-        <SearchBar onSearch={(data: any) => console.log(data)} />
+        <SearchBar
+          onSearch={(value: string) => {
+            setSearch(value.trim());
+            setPagination((prev) => ({
+              ...prev,
+              pageIndex: 0, // reset to first page on new search
+            }));
+          }}
+        />
       </div>
+
       <DataTable
         columns={columns}
         data={stores}

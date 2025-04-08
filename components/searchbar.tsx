@@ -1,23 +1,50 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
-export default function SearchBar({ onSearch }) {
+interface SearchBarProps {
+  onSearch: (value: string) => void;
+}
+
+export default function SearchBar({ onSearch }: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
-    onSearch(searchTerm);
+    onSearch(searchTerm.trim());
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    onSearch("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
     <div className="relative flex items-center max-w-sm">
       <Input
-        placeholder="Search.."
+        placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="pl-3 pr-10"
+        onKeyDown={handleKeyDown}
+        className="pl-3 pr-16"
       />
+      {searchTerm && (
+        <Button
+          type="button"
+          onClick={handleClear}
+          variant="ghost"
+          size="icon"
+          className="absolute right-9 text-muted-foreground hover:text-muted-foreground"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
       <Button
         type="button"
         onClick={handleSearch}
