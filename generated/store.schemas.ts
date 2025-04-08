@@ -49,5 +49,6 @@ export interface StoreCreate {
 export type GetStoresParams = {
 search?: string;
 page?: number;
+limit?: number;
 };
 

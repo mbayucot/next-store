@@ -19,7 +19,7 @@ export default function StoresPage() {
   const { pageIndex, pageSize } = pagination;
 
   const { data, isLoading, isError } = useGetStores({
-    page: pageIndex + 1, // backend expects 1-based
+    page: pageIndex + 1,
     limit: pageSize,
   });
 
@@ -41,7 +41,7 @@ export default function StoresPage() {
             </DialogTrigger>
           }
         />
-        <SearchBar onSearch={(data) => console.log(data)} />
+        <SearchBar onSearch={(data: any) => console.log(data)} />
       </div>
       <DataTable
         columns={columns}

@@ -63,6 +63,12 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
       responses:
         '200':
           description: List of stores with pagination metadata
