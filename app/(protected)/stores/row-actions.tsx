@@ -24,7 +24,7 @@ interface RowActionsProps {
 }
 
 export function RowActions(row: RowActionsProps) {
-  const { isPending, mutate } = useDeleteStoresId();
+  const { mutate } = useDeleteStoresId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -39,7 +39,6 @@ export function RowActions(row: RowActionsProps) {
               description: "The store was successfully deleted.",
             });
 
-            // Invalidate the stores query
             queryClient.invalidateQueries({ queryKey: getGetStoresQueryKey() });
 
             resolve();

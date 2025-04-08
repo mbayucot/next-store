@@ -18,8 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { StoreSchema } from "@/generated/zod";
-import { usePostStores, useGetStoresId } from "@/generated/store/store";
+import {
+  usePostStores,
+  useGetStoresId,
+  usePutStoresId,
+  getGetStoresQueryKey,
+} from "@/generated/store/store";
 import { LoadingButton } from "@/components/loading-button";
+import { useQueryClient } from "@tanstack/react-query";
 
 type StoreFormProps = {
   storeId?: number;
@@ -28,6 +34,7 @@ type StoreFormProps = {
 
 export function StoreForm({ storeId, onSuccessClose }: StoreFormProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof StoreSchema>>({
     resolver: zodResolver(StoreSchema),
     defaultValues: {
@@ -39,8 +46,8 @@ export function StoreForm({ storeId, onSuccessClose }: StoreFormProps) {
   const { data: storeData } = useGetStoresId(storeId || 0);
 
   const { isPending, mutate } = usePostStores();
+  const { isPending: isPendingUpdate, mutate: mutateUpdate } = usePutStoresId();
 
-  // Pre-fill form when editing
   useEffect(() => {
     if (storeData) {
       form.reset({
@@ -48,29 +55,32 @@ export function StoreForm({ storeId, onSuccessClose }: StoreFormProps) {
         address: storeData.address,
       });
     }
-  }, [storeData]);
+  }, [form, storeData]);
 
   function onSubmit(data: z.infer<typeof StoreSchema>) {
-    mutate(
-      { data },
-      {
-        onSuccess: () => {
-          toast({
-            title: storeId ? "Store updated" : "Store created",
-            description: `The store was successfully ${storeId ? "updated" : "created"}.`,
-          });
-          form.reset();
-          onSuccessClose?.();
-        },
-        onError: (error: any) => {
-          toast({
-            variant: "destructive",
-            title: "Something went wrong",
-            description: error?.message || "Failed to save store.",
-          });
-        },
-      },
-    );
+    const onSuccess = () => {
+      toast({
+        title: storeId ? "Store updated" : "Store created",
+        description: `The store was successfully ${storeId ? "updated" : "created"}.`,
+      });
+      queryClient.invalidateQueries({ queryKey: getGetStoresQueryKey() });
+      form.reset();
+      onSuccessClose?.();
+    };
+
+    const onError = (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: error?.message || "Failed to save store.",
+      });
+    };
+
+    if (storeId) {
+      mutateUpdate({ id: storeId, data }, { onSuccess, onError });
+    } else {
+      mutate({ data }, { onSuccess, onError });
+    }
   }
 
   return (
@@ -117,7 +127,7 @@ export function StoreForm({ storeId, onSuccessClose }: StoreFormProps) {
             Cancel
           </Button>
 
-          <LoadingButton loading={isPending} type="submit">
+          <LoadingButton loading={isPending || isPendingUpdate} type="submit">
             Submit
           </LoadingButton>
         </div>
