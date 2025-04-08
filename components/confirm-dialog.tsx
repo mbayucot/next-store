@@ -14,12 +14,12 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { X } from "lucide-react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 interface ConfirmDialogProps {
   trigger: ReactNode;
   title?: string;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void; // allow async too
 }
 
 export default function ConfirmDialog({
@@ -27,8 +27,15 @@ export default function ConfirmDialog({
   title = "Item",
   onConfirm,
 }: ConfirmDialogProps) {
+  const [open, setOpen] = useState(false);
+
+  const handleConfirm = async () => {
+    await onConfirm(); // await if async
+    setOpen(false); // close dialog
+  };
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <div className="-mt-3 -mx-6 border-b pb-3 px-6 flex justify-between items-center">
@@ -55,7 +62,7 @@ export default function ConfirmDialog({
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
-              onConfirm();
+              handleConfirm(); // call wrapped confirm + close
             }}
           >
             Continue

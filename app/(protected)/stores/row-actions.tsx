@@ -1,4 +1,3 @@
-// components/row-actions.tsx
 "use client";
 
 import {
@@ -11,12 +10,51 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import ConfirmDialog from "@/components/confirm-dialog";
+import {
+  useDeleteStoresId,
+  getGetStoresQueryKey,
+} from "@/generated/store/store";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface RowActionsProps {
   row?: any;
 }
 
 export function RowActions(row: RowActionsProps) {
+  const { isPending, mutate } = useDeleteStoresId();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleDelete = async () => {
+    return new Promise<void>((resolve) => {
+      mutate(
+        { id: row.row.id },
+        {
+          onSuccess: () => {
+            toast({
+              title: "Store deleted",
+              description: "The store was successfully deleted.",
+            });
+
+            // ✅ Invalidate the stores list
+            queryClient.invalidateQueries({ queryKey: getGetStoresQueryKey() });
+
+            resolve();
+          },
+          onError: (error: any) => {
+            toast({
+              variant: "destructive",
+              title: "Something went wrong",
+              description: error?.message || "Delete failed.",
+            });
+            resolve();
+          },
+        },
+      );
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +68,7 @@ export function RowActions(row: RowActionsProps) {
         <DropdownMenuItem>Edit</DropdownMenuItem>
         <DropdownMenuItem asChild>
           <ConfirmDialog
-            title="Account"
+            title="Store"
             trigger={
               <Button
                 variant="ghost"
@@ -39,9 +77,7 @@ export function RowActions(row: RowActionsProps) {
                 Delete
               </Button>
             }
-            onConfirm={() => {
-              console.log("Delete action triggered");
-            }}
+            onConfirm={handleDelete}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
