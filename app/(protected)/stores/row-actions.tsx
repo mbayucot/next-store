@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import ConfirmDialog from "@/components/confirm-dialog";
+import { DialogTrigger } from "@/components/ui/dialog";
+import { FormDialog } from "./form-dialog";
 import {
   useDeleteStoresId,
   getGetStoresQueryKey,
@@ -37,7 +39,7 @@ export function RowActions(row: RowActionsProps) {
               description: "The store was successfully deleted.",
             });
 
-            // ✅ Invalidate the stores list
+            // Invalidate the stores query
             queryClient.invalidateQueries({ queryKey: getGetStoresQueryKey() });
 
             resolve();
@@ -63,9 +65,27 @@ export function RowActions(row: RowActionsProps) {
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <FormDialog
+            storeId={row.row.id}
+            title="Edit Store"
+            trigger={
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full px-2 py-1.5 justify-start"
+                >
+                  Edit
+                </Button>
+              </DialogTrigger>
+            }
+          />
+        </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <ConfirmDialog
             title="Store"

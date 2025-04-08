@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useEffect } from "react";
 
 import {
   Form,
@@ -17,16 +18,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { StoreSchema } from "@/generated/zod";
-import { usePostStores } from "@/generated/store/store";
+import { usePostStores, useGetStoresId } from "@/generated/store/store";
 import { LoadingButton } from "@/components/loading-button";
 
 type StoreFormProps = {
+  storeId?: number;
   onSuccessClose?: () => void;
 };
 
-export function StoreForm({ onSuccessClose }: StoreFormProps) {
+export function StoreForm({ storeId, onSuccessClose }: StoreFormProps) {
   const { toast } = useToast();
-
   const form = useForm<z.infer<typeof StoreSchema>>({
     resolver: zodResolver(StoreSchema),
     defaultValues: {
@@ -35,7 +36,19 @@ export function StoreForm({ onSuccessClose }: StoreFormProps) {
     },
   });
 
+  const { data: storeData } = useGetStoresId(storeId || 0);
+
   const { isPending, mutate } = usePostStores();
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (storeData) {
+      form.reset({
+        name: storeData.name,
+        address: storeData.address,
+      });
+    }
+  }, [storeData]);
 
   function onSubmit(data: z.infer<typeof StoreSchema>) {
     mutate(
@@ -43,17 +56,17 @@ export function StoreForm({ onSuccessClose }: StoreFormProps) {
       {
         onSuccess: () => {
           toast({
-            title: "Store created",
-            description: "The store was successfully created.",
+            title: storeId ? "Store updated" : "Store created",
+            description: `The store was successfully ${storeId ? "updated" : "created"}.`,
           });
           form.reset();
-          onSuccessClose?.(); // Close dialog on success
+          onSuccessClose?.();
         },
         onError: (error: any) => {
           toast({
             variant: "destructive",
             title: "Something went wrong",
-            description: error?.message || "Failed to create store.",
+            description: error?.message || "Failed to save store.",
           });
         },
       },

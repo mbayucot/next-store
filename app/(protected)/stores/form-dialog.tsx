@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { StoreForm } from "./form"; // Adjust path as needed
+import { StoreForm } from "./form";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +9,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type DialogDemoProps = {
+type FormDialogProps = {
   trigger: React.ReactNode;
+  storeId?: number;
+  title?: string;
 };
 
-export function FormDialog({ trigger }: DialogDemoProps) {
+export function FormDialog({
+  trigger,
+  storeId,
+  title = "Create Store",
+}: FormDialogProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -21,9 +27,9 @@ export function FormDialog({ trigger }: DialogDemoProps) {
       {trigger}
       <DialogContent className="p-0">
         <DialogHeader className="p-6 border-b">
-          <DialogTitle>Create Store</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <StoreForm onSuccessClose={() => setOpen(false)} />
+        <StoreForm storeId={storeId} onSuccessClose={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );
