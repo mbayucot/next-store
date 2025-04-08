@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import ConfirmDialog from "@/app/(protected)/stores/confirm-dialog";
+import ConfirmDialog from "@/components/confirm-dialog";
 
 interface RowActionsProps {
   row?: any;

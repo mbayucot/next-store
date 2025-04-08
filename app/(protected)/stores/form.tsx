@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,55 +14,100 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { StoreSchema } from "@/generated/zod";
+import { usePostStores } from "@/generated/store/store";
+import { LoadingButton } from "@/components/loading-button";
 
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+type StoreFormProps = {
+  onSuccessClose?: () => void;
+};
 
-export function InputForm() {
+export function StoreForm({ onSuccessClose }: StoreFormProps) {
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof StoreSchema>>({
+    resolver: zodResolver(StoreSchema),
     defaultValues: {
-      username: "",
+      name: "",
+      address: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const { isPending, mutate } = usePostStores();
+
+  function onSubmit(data: z.infer<typeof StoreSchema>) {
+    mutate(
+      { data },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Store created",
+            description: "The store was successfully created.",
+          });
+          form.reset();
+          onSuccessClose?.(); // Close dialog on success
+        },
+        onError: (error: any) => {
+          toast({
+            variant: "destructive",
+            title: "Something went wrong",
+            description: error?.message || "Failed to create store.",
+          });
+        },
+      },
+    );
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="px-6 space-y-6">
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>This is the name of your store.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name.
+                The physical or mailing address of the store.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+
+        <div className="flex gap-4 items-center justify-end py-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onSuccessClose?.()}
+          >
+            Cancel
+          </Button>
+
+          <LoadingButton loading={isPending} type="submit">
+            Submit
+          </LoadingButton>
+        </div>
       </form>
     </Form>
   );
